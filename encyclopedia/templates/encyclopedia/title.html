@@ -5,6 +5,8 @@
 {% endblock %}
 
 {% block body %}
-    {{title}}
+
+    {{content}}
+    <a href="{% url 'editPage' title %} " name="title">Edit</a>
 
 {% endblock %}

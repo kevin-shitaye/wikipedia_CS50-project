@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
-
+import random
+from django.shortcuts import redirect
 
 from . import util
 
@@ -13,11 +13,12 @@ def index(request):
 
 def entry(request, title):
     if util.get_entry(title):
-        title = util.get_entry(title)
+        content = util.get_entry(title)
     else:
-        title = "Page not found"
+        content = "Page not found"
     return render(request, "encyclopedia/title.html", {
-        "title": title
+        "title": title,
+        "content":content
     })
 
 
@@ -26,7 +27,8 @@ def search(request):
     if request.method == "POST":
         if util.get_entry(q):
             return render(request, "encyclopedia/title.html", {
-                "title":util.get_entry(q)
+                "title":q,
+                "content":util.get_entry(q)
             })
         else:
             result = []
@@ -39,12 +41,55 @@ def search(request):
                 })
             else:
                 return render(request, "encyclopedia/title.html", {
-                "title": "Page not found"
+                "content": "Page not found"
             })
 
+def newPage(request):
+    if request.method == "POST":
+        if request.POST['title'] not in util.list_entries():
+            title = request.POST['title']
+            content = request.POST['content']
+            util.save_entry(title, content)
+            return render(request, "encyclopedia/title.html", {
+                'title' : util.get_entry(title)
+            })
+        else:
+            return render(request, "encyclopedia/title.html", {
+                'title': "Page already exist!"
+            })
+    else:
+        return render(request, "encyclopedia/new.html")
+
+def editPage(request, title):
+    content = util.get_entry(title)
+    return render(request, "encyclopedia/edit.html", {
+        "title": title,
+        "content":content
+    })
 
 
+def edit(request):
+    if request.method == "POST":
+        title = request.POST['title']
+        content = request.POST['content']
+        util.save_entry(title, content)
+        return render(request, "encyclopedia/title.html", {
+            "title":title,
+            "content":content
+        })
+    #TODO try to use redirect
 
+#TODO markdown
+
+
+def randomPage(request):
+    pages = util.list_entries()
+    choice = random.choice(pages)
+    page = util.get_entry(choice)
+    return render(request, "encyclopedia/title.html", {
+        "title":choice,
+        "content" : page
+    })
 
 
 
