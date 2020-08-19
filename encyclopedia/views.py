@@ -1,7 +1,6 @@
 from django.shortcuts import render
 import random
 from django.shortcuts import redirect
-
 from . import util
 
 
@@ -18,7 +17,7 @@ def entry(request, title):
         content = "Page not found"
     return render(request, "encyclopedia/title.html", {
         "title": title,
-        "content":content
+        "content":util.convert(content)
     })
 
 
@@ -28,7 +27,7 @@ def search(request):
         if util.get_entry(q):
             return render(request, "encyclopedia/title.html", {
                 "title":q,
-                "content":util.get_entry(q)
+                "content":util.convert(util.get_entry(q))
             })
         else:
             result = []
@@ -41,6 +40,7 @@ def search(request):
                 })
             else:
                 return render(request, "encyclopedia/title.html", {
+                "title":q,
                 "content": "Page not found"
             })
 
@@ -75,11 +75,8 @@ def edit(request):
         util.save_entry(title, content)
         return render(request, "encyclopedia/title.html", {
             "title":title,
-            "content":content
+            "content":util.convert(content)
         })
-    #TODO try to use redirect
-
-#TODO markdown
 
 
 def randomPage(request):
@@ -88,7 +85,7 @@ def randomPage(request):
     page = util.get_entry(choice)
     return render(request, "encyclopedia/title.html", {
         "title":choice,
-        "content" : page
+        "content" : util.convert(page)
     })
 
 
